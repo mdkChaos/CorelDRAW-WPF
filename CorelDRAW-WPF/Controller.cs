@@ -74,7 +74,7 @@ namespace CorelDRAW_WPF
             }
         }
 
-        public void ExtractDataFromExcel()
+        async void ExtractDataFromExcel(CancellationTokenSource cts)
         {
             Excel.Application excelApp = null;
             Excel.Workbooks workBooks = null;
@@ -98,12 +98,21 @@ namespace CorelDRAW_WPF
                 sw.Start();
                 workSheets = workBook.Worksheets;
                 workSheet = (Excel.Worksheet)workSheets.get_Item(1);
-                mainWindow.OutputText.Text += "Подождите, идёт обработка файла Excel.\n";
+                await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
+                {
+                    mainWindow.OutputText.Text += "Подождите, идёт обработка файла Excel.\n";
+                }));
                 ReadFromRow(workSheet);
-                mainWindow.OutputText.Text += "Файл Excel, обработан. Можете продолжить работу.\n";
+                await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
+                {
+                    mainWindow.OutputText.Text += "Файл Excel, обработан. Можете продолжить работу.\n";
+                }));
                 sw.Stop();
-                mainWindow.OutputText.Text += "Время обработки файла Excel: " + (sw.ElapsedMilliseconds / 1000.0).ToString() + " сек.\n";
-                mainWindow.OutputText.Text += "Обработанно: " + datas.Count + " строк.\n";
+                await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
+                {
+                    mainWindow.OutputText.Text += "Время обработки файла Excel: " + (sw.ElapsedMilliseconds / 1000.0).ToString() + " сек.\n";
+                    mainWindow.OutputText.Text += "Обработанно: " + datas.Count + " строк.\n";
+                }));
             }
             catch (Exception ex)
             {
@@ -121,217 +130,12 @@ namespace CorelDRAW_WPF
             }
         }
 
-        public void InsertDataToCorel()
+        public async Task StartExcelTaskAsync(CancellationTokenSource cts)
         {
-            CorelDRAW.Application corelApp = null;
-            VGCore.Document document = null;
-            VGCore.Pages pages = null;
-            VGCore.Page page = null;
-            VGCore.Layer layer = null;
-            VGCore.Shapes shapes = null;
-            VGCore.ShapeRange shapeRange = null;
-            Stopwatch sw = new Stopwatch();
-
-            try
-            {
-                corelApp = new CorelDRAW.Application
-                {
-                    Visible = false,
-                    Optimization = true,
-                    EventsEnabled = false
-                };
-
-                OpenFile("CorelDRAW files(*.cdr)|*.cdr");
-                document = corelApp.OpenDocument(FileName, 1);
-                document.BeginCommandGroup("Fast");
-                document.SaveSettings();
-                document.PreserveSelection = false;
-
-                sw.Start();
-
-                pages = document.Pages;
-                page = pages.First;
-                layer = page.Layers["Layer1"];
-                shapes = layer.Shapes;
-                shapeRange = shapes.All();
-
-                mainWindow.OutputText.Text += "Подождите, идёт обработка файла CorelDRAW.\n";
-                ProcessToCorel(corelApp, document, shapeRange);
-                mainWindow.OutputText.Text += "Файл CorelDRAW, обработан. Можете продолжить работу.\n";
-
-                sw.Stop();
-
-                mainWindow.OutputText.Text += "Время обработки файла CorelDRAW: " + (sw.ElapsedMilliseconds / 1000.0).ToString() + " сек.\n";
-                mainWindow.OutputText.Text += "Обработанно: " + datas.Count + " строк.\n";
-
-                document.PreserveSelection = true;
-                document.ResetSettings();
-                corelApp.EventsEnabled = true;
-                corelApp.Optimization = false;
-                document.EndCommandGroup();
-                corelApp.Refresh();
-                corelApp.ActiveWindow.Refresh();
-                corelApp.Visible = true;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-            finally
-            {
-                Marshal.ReleaseComObject(shapeRange);
-                Marshal.ReleaseComObject(shapes);
-                Marshal.ReleaseComObject(layer);
-                Marshal.ReleaseComObject(page);
-                Marshal.ReleaseComObject(pages);
-                Marshal.ReleaseComObject(document);
-                Marshal.ReleaseComObject(corelApp);
-            }
+            await Task.Run(() => ExtractDataFromExcel(cts));
         }
 
-        private void ProcessToCorel(CorelDRAW.Application corelApp, VGCore.Document document, VGCore.ShapeRange shapeRange)
-        {
-            string fullPath;
-            VGCore.Page newPage = null;
-            VGCore.Layer newLayer = null;
-            VGCore.Shape shape = null;
-            VGCore.Text text = null;
-            VGCore.TextRange textRange = null;
-            VGCore.ImportFilter importFilter = null;
-            VGCore.DataItem image = null;
-
-            foreach (DataModel item in datas)
-            {
-                if (item.IsUp)
-                {
-                    shapeRange.Copy();
-                    newPage = document.InsertPagesEx(1, false, document.ActivePage.Index, 11.692913, 8.267717);
-                    newLayer = newPage.Layers["Layer1"];
-                    newLayer.PasteEx(corelApp.CreateStructPasteOptions());
-
-                    shape = newPage.Shapes["Name1"];
-                    text = shape.Text;
-                    textRange = text.Story;
-                    textRange.Text = item.ChildName;
-                    shape.SizeWidth = 4.5;
-
-                    shape = newPage.Shapes["Customer1"];
-                    text = shape.Text;
-                    textRange = text.Story;
-                    textRange.Text = item.Customer;
-
-                    shape = newPage.Shapes["Pocket1"];
-                    text = shape.Text;
-                    textRange = text.Story;
-                    textRange.Text = item.Pocket;
-
-                    shape = newPage.Shapes["DoorWidth1"];
-                    text = shape.Text;
-                    textRange = text.Story;
-                    textRange.Text = item.DoorWidth.ToString();
-
-                    shape = newPage.Shapes["ImageNumber1"];
-                    text = shape.Text;
-                    textRange = text.Story;
-                    textRange.Text = item.ImageNumber;
-
-                    fullPath = Path.GetDirectoryName(FileName) + @"\img\" + item.ImageNumber + ".png";
-
-                    if (item.ImageNumber != "0")
-                    {
-                        importFilter = newLayer.ImportEx(fullPath, VGCore.cdrFilter.cdrPNG);
-                        importFilter.Finish();
-
-                        shape = newPage.Shapes[item.ImageNumber + ".png"];
-                        image = shape.ObjectData["Name"];
-                        image.Value = item.ImageNumber;
-                        if (Convert.ToDouble(item.DoorWidth) <= 25)
-                        {
-                            shape.PositionX = 7.97 - shape.SizeWidth;
-                            shape.PositionY = 6.299 + shape.SizeHeight / 2;
-                        }
-                        else if (Convert.ToDouble(item.DoorWidth) > 25 && Convert.ToDouble(item.DoorWidth) < 29)
-                        {
-                            shape.PositionX = 10.192 - shape.SizeWidth;
-                            shape.PositionY = 6.299 + shape.SizeHeight / 2;
-                        }
-                        else if (Convert.ToDouble(item.DoorWidth) >= 29)
-                        {
-                            shape.PositionX = 10.735 - shape.SizeWidth;
-                            shape.PositionY = 6.299 + shape.SizeHeight / 2;
-                        }
-                    }
-                }
-                else
-                {
-                    newPage = document.Pages[2];
-                    newLayer = newPage.Layers["Layer1"];
-
-                    shape = newPage.Shapes["Name2"];
-                    text = shape.Text;
-                    textRange = text.Story;
-                    textRange.Text = item.ChildName;
-                    shape.SizeWidth = 4.5;
-
-                    shape = newPage.Shapes["Customer2"];
-                    text = shape.Text;
-                    textRange = text.Story;
-                    textRange.Text = item.Customer;
-
-                    shape = newPage.Shapes["Pocket2"];
-                    text = shape.Text;
-                    textRange = text.Story;
-                    textRange.Text = item.Pocket;
-
-                    shape = newPage.Shapes["DoorWidth2"];
-                    text = shape.Text;
-                    textRange = text.Story;
-                    textRange.Text = item.DoorWidth.ToString();
-
-                    shape = newPage.Shapes["ImageNumber2"];
-                    text = shape.Text;
-                    textRange = text.Story;
-                    textRange.Text = item.ImageNumber;
-
-                    fullPath = Path.GetDirectoryName(FileName) + @"\img\" + item.ImageNumber + ".png";
-
-                    if (item.ImageNumber != "0")
-                    {
-                        importFilter = newLayer.ImportEx(fullPath, VGCore.cdrFilter.cdrPNG);
-                        importFilter.Finish();
-
-                        shape = newPage.Shapes[item.ImageNumber + ".png"];
-                        image = shape.ObjectData["Name"];
-                        image.Value = item.ImageNumber;
-                        if (item.DoorWidth <= 25)
-                        {
-                            shape.PositionX = 7.97 - shape.SizeWidth;
-                            shape.PositionY = 1.969 + shape.SizeHeight / 2;
-                        }
-                        else if (item.DoorWidth > 25 && item.DoorWidth < 29)
-                        {
-                            shape.PositionX = 10.192 - shape.SizeWidth;
-                            shape.PositionY = 1.969 + shape.SizeHeight / 2;
-                        }
-                        else if (item.DoorWidth >= 29)
-                        {
-                            shape.PositionX = 10.735 - shape.SizeWidth;
-                            shape.PositionY = 1.969 + shape.SizeHeight / 2;
-                        }
-                    }
-                }
-            }
-
-            Marshal.ReleaseComObject(image);
-            Marshal.ReleaseComObject(importFilter);
-            Marshal.ReleaseComObject(textRange);
-            Marshal.ReleaseComObject(newLayer);
-            Marshal.ReleaseComObject(newPage);
-            Marshal.ReleaseComObject(text);
-            Marshal.ReleaseComObject(shape);
-        }
-
-        public async Task GetTaskAsync(CancellationTokenSource cts)
+        public async Task StartCorelTaskAsync(CancellationTokenSource cts)
         {
             await Task.Run(() => StartCorelDRAWAsync(cts));
         }
@@ -342,86 +146,217 @@ namespace CorelDRAW_WPF
             VGCore.Document document = null;
             VGCore.Page page = null;
             VGCore.Layer layer = null;
+            VGCore.Shape shape = null;
             VGCore.Rect rect = null;
+            VGCore.ImportFilter importFilter = null;
+            VGCore.DataItem image = null;
             RectanglePosition rectanglePosition;
             RGBAssign rgbAssign;
             ArtisticText artisticText;
             CMYKAssign cmykAssign;
             ParagraphText paragraphText;
+            Stopwatch sw = new Stopwatch();
+            int count = 0;
+            string fullPath;
 
             try
             {
+                OpenFile("CorelDRAW files(*.cdr)|*.cdr");
+                await mainWindow.ProgressBar.Dispatcher.BeginInvoke(DispatcherPriority.Send, new Action(delegate ()
+                {
+                    mainWindow.ProgressBar.Value = 0;
+                }));
                 corelApp = new CorelDRAW.Application
                 {
                     Visible = false,
                     Optimization = true,
                     EventsEnabled = false
                 };
-                document = corelApp.CreateDocument();
+
+                document = corelApp.OpenDocument(FileName, 1);
+                document.BeginCommandGroup("Fast");
+                document.SaveSettings();
+                document.PreserveSelection = false;
+
+                sw.Start();
+                await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
+                {
+                    mainWindow.OutputText.Text += "Подождите, идёт обработка файла CorelDRAW.\n";
+                }));
+
+                //document = corelApp.CreateDocument();
                 document.Unit = VGCore.cdrUnit.cdrMillimeter;
-                page = document.InsertPagesEx(1, false, document.ActivePage.Index, 297, 210);
+
+                foreach (DataModel item in datas)
+                {
+                    if (item.IsUp)
+                    {
+                        page = document.InsertPagesEx(1, false, document.ActivePage.Index, 297, 210);
+                        layer = page.Layers[2];
+
+                        rect = new VGCore.Rect
+                        {
+                            Width = 297,
+                            Height = 100
+                        };
+                        rgbAssign = new RGBAssign(255, 255, 0);
+                        rectanglePosition = new RectanglePosition(0, 210);
+                        CreateRectangleRectAsync(rect, layer, rectanglePosition, rgbAssign, cts);
+
+                        rgbAssign = new RGBAssign(255, 72, 41);
+                        artisticText = new ArtisticText(31.369, 138.2776, item.ChildName, "Kabarett Simple", 205, "Name1");
+                        CreateArtisticTextAsync(layer, artisticText, rgbAssign, cts);
+
+                        cmykAssign = new CMYKAssign(0, 0, 0, 100);
+                        paragraphText = new ParagraphText(13.555, 100.591, 29.112, 109.311, item.ImageNumber, "Arial", 18, "ImageNumber1");
+                        CreateParagraphTextAsync(layer, paragraphText, cmykAssign, cts);
+
+                        cmykAssign = new CMYKAssign(100, 0, 0, 0);
+                        paragraphText = new ParagraphText(29.669, 100.591, 45.227, 109.311, item.DoorWidth.ToString(), "Arial", 18, "DoorWidth1");
+                        CreateParagraphTextAsync(layer, paragraphText, cmykAssign, cts);
+
+                        cmykAssign = new CMYKAssign(100, 0, 100, 0);
+                        paragraphText = new ParagraphText(45.783, 100.591, 72.548, 109.311, item.Pocket, "Arial", 18, "Pocket1");
+                        CreateParagraphTextAsync(layer, paragraphText, cmykAssign, cts);
+
+                        cmykAssign = new CMYKAssign(0, 88, 97, 0);
+                        paragraphText = new ParagraphText(73.104, 100.591, 149.288, 109.311, item.Customer, "Arial", 9, "Customer1");
+                        CreateParagraphTextAsync(layer, paragraphText, cmykAssign, cts);
+
+                        fullPath = Path.GetDirectoryName(FileName) + @"\img\" + item.ImageNumber + ".png";
+
+                        if (item.ImageNumber != "0")
+                        {
+                            importFilter = layer.ImportEx(fullPath, VGCore.cdrFilter.cdrPNG);
+                            importFilter.Finish();
+
+                            shape = page.Shapes[item.ImageNumber + ".png"];
+                            image = shape.ObjectData["Name"];
+                            image.Value = item.ImageNumber;
+                            if (item.DoorWidth <= 25)
+                            {
+                                shape.PositionX = 202.438 - shape.SizeWidth;
+                                shape.PositionY = 159.9946 + shape.SizeHeight / 2;
+                            }
+                            else if (item.DoorWidth > 25 && item.DoorWidth < 29)
+                            {
+                                shape.PositionX = 258.8768 - shape.SizeWidth;
+                                shape.PositionY = 159.9946 + shape.SizeHeight / 2;
+                            }
+                            else if (item.DoorWidth >= 29)
+                            {
+                                shape.PositionX = 272.669 - shape.SizeWidth;
+                                shape.PositionY = 159.9946 + shape.SizeHeight / 2;
+                            }
+                        }
+
+                        count++;
+                        await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
+                        {
+                            mainWindow.OutputText.Text += "Обработанно: " + count + " строк.\n";
+                            mainWindow.OutputText.ScrollToEnd();
+                        }));
+                        await mainWindow.ProgressBar.Dispatcher.BeginInvoke(DispatcherPriority.Send, new Action(delegate ()
+                        {
+                            mainWindow.ProgressBar.Value = (double)count * 100 / datas.Count;
+                        }));
+                    }
+                    else
+                    {
+                        rect = new VGCore.Rect
+                        {
+                            Width = 297,
+                            Height = 100
+                        };
+                        rgbAssign = new RGBAssign(255, 255, 0);
+                        rectanglePosition = new RectanglePosition(0, 100);
+                        CreateRectangleRectAsync(rect, layer, rectanglePosition, rgbAssign, cts);
+
+                        rgbAssign = new RGBAssign(255, 72, 41);
+                        artisticText = new ArtisticText(31.369, 28.7782, item.ChildName, "Kabarett Simple", 205, "Name2");
+                        CreateArtisticTextAsync(layer, artisticText, rgbAssign, cts);
+
+                        cmykAssign = new CMYKAssign(0, 0, 0, 100);
+                        paragraphText = new ParagraphText(226.538, 100.591, 242.096, 109.311, item.ImageNumber, "Arial", 18, "ImageNumber2");
+                        CreateParagraphTextAsync(layer, paragraphText, cmykAssign, cts);
+
+                        cmykAssign = new CMYKAssign(100, 0, 0, 0);
+                        paragraphText = new ParagraphText(242.652, 100.591, 258.21, 109.311, item.DoorWidth.ToString(), "Arial", 18, "DoorWidth2");
+                        CreateParagraphTextAsync(layer, paragraphText, cmykAssign, cts);
+
+                        cmykAssign = new CMYKAssign(100, 0, 100, 0);
+                        paragraphText = new ParagraphText(258.767, 100.591, 285.868, 109.311, item.Pocket, "Arial", 18, "Pocket2");
+                        CreateParagraphTextAsync(layer, paragraphText, cmykAssign, cts);
+
+                        cmykAssign = new CMYKAssign(0, 88, 97, 0);
+                        paragraphText = new ParagraphText(149.845, 100.591, 225.982, 109.311, item.Customer, "Arial", 9, "Customer2");
+                        CreateParagraphTextAsync(layer, paragraphText, cmykAssign, cts);
+
+                        fullPath = Path.GetDirectoryName(FileName) + @"\img\" + item.ImageNumber + ".png";
+
+                        if (item.ImageNumber != "0")
+                        {
+                            importFilter = layer.ImportEx(fullPath, VGCore.cdrFilter.cdrPNG);
+                            importFilter.Finish();
+
+                            shape = page.Shapes[item.ImageNumber + ".png"];
+                            image = shape.ObjectData["Name"];
+                            image.Value = item.ImageNumber;
+                            if (item.DoorWidth <= 25)
+                            {
+                                shape.PositionX = 202.438 - shape.SizeWidth;
+                                shape.PositionY = 50.0126 + shape.SizeHeight / 2;
+                            }
+                            else if (item.DoorWidth > 25 && item.DoorWidth < 29)
+                            {
+                                shape.PositionX = 258.8768 - shape.SizeWidth;
+                                shape.PositionY = 50.0126 + shape.SizeHeight / 2;
+                            }
+                            else if (item.DoorWidth >= 29)
+                            {
+                                shape.PositionX = 272.669 - shape.SizeWidth;
+                                shape.PositionY = 50.0126 + shape.SizeHeight / 2;
+                            }
+                        }
+
+                        count++;
+                        await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
+                        {
+                            mainWindow.OutputText.Text += "Обработанно: " + count + " строк.\n";
+                            mainWindow.OutputText.ScrollToEnd();
+                        }));
+                        await mainWindow.ProgressBar.Dispatcher.BeginInvoke(DispatcherPriority.Send, new Action(delegate ()
+                        {
+                            mainWindow.ProgressBar.Value = (double)count * 100 / datas.Count;
+                        }));
+                    }
+                }
 
                 await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
                 {
-                    mainWindow.OutputText.Text += "Файл создан.\n";
-                    mainWindow.OutputText.Text += "Создадим прямоугольник.\n";
+                    mainWindow.OutputText.Text += "Файл CorelDRAW, обработан. Можете продолжить работу.\n";
                 }));
 
-                //await MainWindow.progressBar.Dispatcher.BeginInvoke(DispatcherPriority.Send, new Action(delegate ()
-                //{
-                //    MainWindow.progressBar.Value = 0;
-                //}));
-
-                layer = page.Layers[2];
-
-                rect = new VGCore.Rect
-                {
-                    Width = 297,
-                    Height = 100
-                };
-                rgbAssign = new RGBAssign(255, 255, 0);
-                rectanglePosition = new RectanglePosition(0, 210);
-                CreateRectangleRect(rect, layer, rectanglePosition, rgbAssign);
-                rectanglePosition = new RectanglePosition(0, 100);
-                CreateRectangleRect(rect, layer, rectanglePosition, rgbAssign);
-
-                rgbAssign = new RGBAssign(255, 72, 41);
-                artisticText = new ArtisticText(31.369, 138.2776, "Name 1", "Kabarett Simple", 205, "Name1");
-                CreateArtisticText(layer, artisticText, rgbAssign);
-                artisticText = new ArtisticText(31.369, 28.7782, "Name 2", "Kabarett Simple", 205, "Name2");
-                CreateArtisticText(layer, artisticText, rgbAssign);
-
-                cmykAssign = new CMYKAssign(0, 0, 0, 100);
-                paragraphText = new ParagraphText(13.555, 100.591, 29.112, 109.311, "номер рисунка", "Arial", 18, "ImageNumber1");
-                CreateParagraphText(layer, paragraphText, cmykAssign);
-                paragraphText = new ParagraphText(226.538, 100.591, 242.096, 109.311, "номер рисунка", "Arial", 18, "ImageNumber2");
-                CreateParagraphText(layer, paragraphText, cmykAssign);
-
-                cmykAssign = new CMYKAssign(100, 0, 0, 0);
-                paragraphText = new ParagraphText(29.669, 100.591, 45.227, 109.311, "ширина дверцы", "Arial", 18, "DoorWidth1");
-                CreateParagraphText(layer, paragraphText, cmykAssign);
-                paragraphText = new ParagraphText(242.652, 100.591, 258.21, 109.311, "ширина дверцы", "Arial", 18, "DoorWidth2");
-                CreateParagraphText(layer, paragraphText, cmykAssign);
-
-                cmykAssign = new CMYKAssign(100, 0, 100, 0);
-                paragraphText = new ParagraphText(45.783, 100.591, 72.548, 109.311, "кармашек", "Arial", 18, "Pocket1");
-                CreateParagraphText(layer, paragraphText, cmykAssign);
-                paragraphText = new ParagraphText(258.767, 100.591, 285.868, 109.311, "кармашек", "Arial", 18, "Pocket2");
-                CreateParagraphText(layer, paragraphText, cmykAssign);
-
-                cmykAssign = new CMYKAssign(0, 88, 97, 0);
-                paragraphText = new ParagraphText(73.104, 100.591, 149.288, 109.311, "заказчик", "Arial", 9, "Customer1");
-                CreateParagraphText(layer, paragraphText, cmykAssign);
-                paragraphText = new ParagraphText(149.845, 100.591, 225.982, 109.311, "заказчик", "Arial", 9, "Customer2");
-                CreateParagraphText(layer, paragraphText, cmykAssign);
+                sw.Stop();
 
                 await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
                 {
-                    mainWindow.OutputText.Text += "Прямоугольник создан.\n";
+                    mainWindow.OutputText.Text += "Время обработки файла CorelDRAW: " + (sw.ElapsedMilliseconds / 1000.0).ToString() + " сек.\n";
+                    mainWindow.OutputText.Text += "Обработанно: " + datas.Count + " строк.\n";
                 }));
 
+                await mainWindow.ProgressBar.Dispatcher.BeginInvoke(DispatcherPriority.Send, new Action(delegate ()
+                {
+                    mainWindow.ProgressBar.Value = 0;
+                }));
+
+                document.PreserveSelection = true;
+                document.ResetSettings();
                 corelApp.EventsEnabled = true;
                 corelApp.Optimization = false;
+                document.EndCommandGroup();
+                corelApp.Refresh();
+                corelApp.ActiveWindow.Refresh();
                 corelApp.Visible = true;
             }
             catch (OperationCanceledException)
@@ -431,16 +366,19 @@ namespace CorelDRAW_WPF
                     mainWindow.OutputText.Text += "Операция была отменена пользователем!\n";
                 }));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
                 {
-                    mainWindow.OutputText.Text += $"Work is failed.\n";
+                    mainWindow.OutputText.Text += $"Work is failed.\n {ex.Message} \n";
                 }));
             }
             finally
             {
                 Marshal.ReleaseComObject(rect);
+                Marshal.ReleaseComObject(image);
+                Marshal.ReleaseComObject(importFilter);
+                Marshal.ReleaseComObject(shape);
                 Marshal.ReleaseComObject(layer);
                 Marshal.ReleaseComObject(page);
                 Marshal.ReleaseComObject(document);
@@ -448,7 +386,7 @@ namespace CorelDRAW_WPF
             }
         }
 
-        void CreateRectangleRect(VGCore.Rect rect, VGCore.Layer layer, RectanglePosition rectanglePosition, RGBAssign rgbAssign)
+        async void CreateRectangleRectAsync(VGCore.Rect rect, VGCore.Layer layer, RectanglePosition rectanglePosition, RGBAssign rgbAssign, CancellationTokenSource cts)
         {
             VGCore.Shape shape = null;
             VGCore.Outline outline = null;
@@ -470,9 +408,19 @@ namespace CorelDRAW_WPF
                     rgbAssign.B
                 );
             }
-            catch (Exception)
+            catch (OperationCanceledException)
             {
-                throw;
+                await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
+                {
+                    mainWindow.OutputText.Text += "Операция была отменена пользователем!\n";
+                }));
+            }
+            catch (Exception ex)
+            {
+                await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
+                {
+                    mainWindow.OutputText.Text += $"Work is failed.\n {ex.Message} \n";
+                }));
             }
             finally
             {
@@ -483,7 +431,7 @@ namespace CorelDRAW_WPF
             }
         }
 
-        void CreateArtisticText(VGCore.Layer layer, ArtisticText artisticText, RGBAssign rgbAssign)
+        async void CreateArtisticTextAsync(VGCore.Layer layer, ArtisticText artisticText, RGBAssign rgbAssign, CancellationTokenSource cts)
         {
             VGCore.Shape shape = null;
             VGCore.Fill fill = null;
@@ -514,9 +462,19 @@ namespace CorelDRAW_WPF
                 shape.Name = artisticText.Name;
                 shape.SizeWidth = artisticText.SizeWidth;
             }
-            catch (Exception)
+            catch (OperationCanceledException)
             {
-                throw;
+                await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
+                {
+                    mainWindow.OutputText.Text += "Операция была отменена пользователем!\n";
+                }));
+            }
+            catch (Exception ex)
+            {
+                await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
+                {
+                    mainWindow.OutputText.Text += $"Work is failed.\n {ex.Message} \n";
+                }));
             }
             finally
             {
@@ -526,7 +484,7 @@ namespace CorelDRAW_WPF
             }
         }
 
-        void CreateParagraphText(VGCore.Layer layer, ParagraphText paragraphText, CMYKAssign cmykAssign)
+        async void CreateParagraphTextAsync(VGCore.Layer layer, ParagraphText paragraphText, CMYKAssign cmykAssign, CancellationTokenSource cts)
         {
             VGCore.Shape shape = null;
             VGCore.Outline outline = null;
@@ -561,9 +519,19 @@ namespace CorelDRAW_WPF
                 outline.SetNoOutline();
                 shape.Name = paragraphText.Name;
             }
-            catch (Exception)
+            catch (OperationCanceledException)
             {
-                throw;
+                await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
+                {
+                    mainWindow.OutputText.Text += "Операция была отменена пользователем!\n";
+                }));
+            }
+            catch (Exception ex)
+            {
+                await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
+                {
+                    mainWindow.OutputText.Text += $"Work is failed.\n {ex.Message} \n";
+                }));
             }
             finally
             {

@@ -7,10 +7,10 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Button Name="ProcessExcelFile" Content="Process Excel file" HorizontalAlignment="Left" Margin="20,20,0,0" VerticalAlignment="Top" Width="140" Height="30" Click="ProcessExcelFile_Click"/>
-        <Button Name="ProcessCorelDRAWFile" Content="Process CorelDRAW file" HorizontalAlignment="Left" Margin="20,70,0,0" VerticalAlignment="Top" Width="140" Height="30" Click="ProcessCorelDRAWFile_Click"/>
-        <TextBlock Name="OutputText" HorizontalAlignment="Stretch" Margin="180,20,20,20" TextWrapping="Wrap" Text="" VerticalAlignment="Top" MinHeight="130" MaxHeight="900" Width="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"/>
-        <Button x:Name="Test" Content="Test" HorizontalAlignment="Left" Margin="20,120,0,0" VerticalAlignment="Top" Width="140" Height="30" Click="Test_ClickAsync"/>
-        <Button x:Name="Cancel" Content="Cancel" HorizontalAlignment="Left" Margin="20,170,0,0" VerticalAlignment="Top" Width="140" Height="30" Click="Cancel_Click"/>
+        <Button Name="ProcessExcelFile" Content="Process Excel file" HorizontalAlignment="Left" Margin="20,20,0,0" VerticalAlignment="Top" Width="140" Height="30" Click="ProcessExcelFile_ClickAsync"/>
+        <Button Name="ProcessCorelDRAWFile" Content="Process CorelDRAW file" HorizontalAlignment="Left" Margin="20,70,0,0" VerticalAlignment="Top" Width="140" Height="30" Click="ProcessCorelDRAWFile_ClickAsync"/>
+        <Button Name="Cancel" Content="Cancel" HorizontalAlignment="Left" Margin="20,120,0,0" VerticalAlignment="Top" Width="140" Height="30" Click="Cancel_Click"/>
+        <TextBox Name="OutputText" HorizontalAlignment="Stretch" Margin="180,20,20,80" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="Auto" Width="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" IsReadOnly="True" BorderBrush="{x:Null}"/>
+        <ProgressBar Name="ProgressBar" Minimum="0" Maximum="100" HorizontalAlignment="Stretch" Height="40" Margin="20,20,20,20" VerticalAlignment="Bottom"/>
     </Grid>
 </Window>
