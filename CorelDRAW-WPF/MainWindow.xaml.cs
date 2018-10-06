@@ -20,32 +20,32 @@ namespace CorelDRAW_WPF
         {
             ProcessExcelFile.IsEnabled = false;
             ProcessCorelDRAWFile.IsEnabled = false;
-            try
-            {
+            //try
+            //{
                 cts = new CancellationTokenSource();
                 await controller.StartExcelTaskAsync(cts);
-            }
-            finally
-            {
+            //}
+            //finally
+            //{
                 ProcessExcelFile.IsEnabled = true;
                 ProcessCorelDRAWFile.IsEnabled = true;
-            }
+            //}
         }
 
         private async void ProcessCorelDRAWFile_ClickAsync(object sender, RoutedEventArgs e)
         {
             ProcessExcelFile.IsEnabled = false;
             ProcessCorelDRAWFile.IsEnabled = false;
-            try
-            {
+            //try
+            //{
                 cts = new CancellationTokenSource();
                 await controller.StartCorelTaskAsync(cts);
-            }
-            finally
-            {
+            //}
+            //finally
+            //{
                 ProcessExcelFile.IsEnabled = true;
                 ProcessCorelDRAWFile.IsEnabled = true;
-            }
+            //}
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)

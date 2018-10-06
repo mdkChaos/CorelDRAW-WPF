@@ -85,38 +85,52 @@ namespace CorelDRAW_WPF
             Stopwatch sw = new Stopwatch();
             try
             {
+                OpenFile("Excel files(*.xls*)|*.xls*");
+                await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
+                {
+                    mainWindow.OutputText.Text += "Подождите, идёт обработка файла Excel.\n";
+                }));
                 excelApp = new Excel.Application
                 {
                     Visible = false,
                     ScreenUpdating = false,
                     EnableEvents = false
                 };
-                OpenFile("Excel files(*.xls*)|*.xls*");
-
+                
                 workBooks = excelApp.Workbooks;
                 workBook = workBooks.Open(FileName);
                 sw.Start();
                 workSheets = workBook.Worksheets;
                 workSheet = (Excel.Worksheet)workSheets.get_Item(1);
-                await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
-                {
-                    mainWindow.OutputText.Text += "Подождите, идёт обработка файла Excel.\n";
-                }));
+
                 ReadFromRow(workSheet);
+
                 await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
                 {
                     mainWindow.OutputText.Text += "Файл Excel, обработан. Можете продолжить работу.\n";
-                }));
-                sw.Stop();
-                await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
-                {
+
+                    sw.Stop();
+
                     mainWindow.OutputText.Text += "Время обработки файла Excel: " + (sw.ElapsedMilliseconds / 1000.0).ToString() + " сек.\n";
                     mainWindow.OutputText.Text += "Обработанно: " + datas.Count + " строк.\n";
+                    mainWindow.OutputText.ScrollToEnd();
+                }));
+            }
+            catch (OperationCanceledException)
+            {
+                await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
+                {
+                    mainWindow.OutputText.Text += "Операция была отменена пользователем!\n";
+                    mainWindow.OutputText.ScrollToEnd();
                 }));
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
+                {
+                    mainWindow.OutputText.Text += $"Work is failed.\n{ex.Message}\n";
+                    mainWindow.OutputText.ScrollToEnd();
+                }));
             }
             finally
             {
@@ -166,6 +180,10 @@ namespace CorelDRAW_WPF
                 {
                     mainWindow.ProgressBar.Value = 0;
                 }));
+                await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
+                {
+                    mainWindow.OutputText.Text += "Подождите, идёт обработка файла CorelDRAW.\n";
+                }));
                 corelApp = new CorelDRAW.Application
                 {
                     Visible = false,
@@ -179,10 +197,6 @@ namespace CorelDRAW_WPF
                 document.PreserveSelection = false;
 
                 sw.Start();
-                await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
-                {
-                    mainWindow.OutputText.Text += "Подождите, идёт обработка файла CorelDRAW.\n";
-                }));
 
                 //document = corelApp.CreateDocument();
                 document.Unit = VGCore.cdrUnit.cdrMillimeter;
@@ -335,14 +349,12 @@ namespace CorelDRAW_WPF
                 await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
                 {
                     mainWindow.OutputText.Text += "Файл CorelDRAW, обработан. Можете продолжить работу.\n";
-                }));
 
-                sw.Stop();
+                    sw.Stop();
 
-                await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
-                {
                     mainWindow.OutputText.Text += "Время обработки файла CorelDRAW: " + (sw.ElapsedMilliseconds / 1000.0).ToString() + " сек.\n";
                     mainWindow.OutputText.Text += "Обработанно: " + datas.Count + " строк.\n";
+                    mainWindow.OutputText.ScrollToEnd();
                 }));
 
                 await mainWindow.ProgressBar.Dispatcher.BeginInvoke(DispatcherPriority.Send, new Action(delegate ()
@@ -364,13 +376,15 @@ namespace CorelDRAW_WPF
                 await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
                 {
                     mainWindow.OutputText.Text += "Операция была отменена пользователем!\n";
+                    mainWindow.OutputText.ScrollToEnd();
                 }));
             }
             catch (Exception ex)
             {
                 await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
                 {
-                    mainWindow.OutputText.Text += $"Work is failed.\n {ex.Message} \n";
+                    mainWindow.OutputText.Text += $"Work is failed.\n{ex.Message}\n";
+                    mainWindow.OutputText.ScrollToEnd();
                 }));
             }
             finally
@@ -419,7 +433,7 @@ namespace CorelDRAW_WPF
             {
                 await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
                 {
-                    mainWindow.OutputText.Text += $"Work is failed.\n {ex.Message} \n";
+                    mainWindow.OutputText.Text += $"Work is failed.\n{ex.Message}\n";
                 }));
             }
             finally
@@ -473,7 +487,7 @@ namespace CorelDRAW_WPF
             {
                 await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
                 {
-                    mainWindow.OutputText.Text += $"Work is failed.\n {ex.Message} \n";
+                    mainWindow.OutputText.Text += $"Work is failed.\n{ex.Message}\n";
                 }));
             }
             finally
@@ -530,7 +544,7 @@ namespace CorelDRAW_WPF
             {
                 await mainWindow.OutputText.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
                 {
-                    mainWindow.OutputText.Text += $"Work is failed.\n {ex.Message} \n";
+                    mainWindow.OutputText.Text += $"Work is failed.\n{ex.Message}\n";
                 }));
             }
             finally
