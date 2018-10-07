@@ -4,6 +4,7 @@
              xmlns:local="clr-namespace:CorelDRAW_WPF"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        
     </Application.Resources>
+    
 </Application>

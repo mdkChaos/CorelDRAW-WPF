@@ -5,12 +5,62 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CorelDRAW_WPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        <Button Name="ProcessExcelFile" Content="Process Excel file" HorizontalAlignment="Left" Margin="20,20,0,0" VerticalAlignment="Top" Width="140" Height="30" Click="ProcessExcelFile_ClickAsync"/>
-        <Button Name="ProcessCorelDRAWFile" Content="Process CorelDRAW file" HorizontalAlignment="Left" Margin="20,70,0,0" VerticalAlignment="Top" Width="140" Height="30" Click="ProcessCorelDRAWFile_ClickAsync"/>
-        <Button Name="Cancel" Content="Cancel" HorizontalAlignment="Left" Margin="20,120,0,0" VerticalAlignment="Top" Width="140" Height="30" Click="Cancel_Click"/>
-        <TextBox Name="OutputText" HorizontalAlignment="Stretch" Margin="180,20,20,80" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="Auto" Width="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" IsReadOnly="True" BorderBrush="{x:Null}"/>
-        <ProgressBar Name="ProgressBar" Minimum="0" Maximum="100" HorizontalAlignment="Stretch" Height="40" Margin="20,20,20,20" VerticalAlignment="Bottom"/>
+        Title="Import from Excel to CorelDRAW"
+        Height="450"
+        Width="800"
+        Icon="Images/corel-excel-32.ico">
+    <Grid Background="#FF212121">
+        <Button
+            Name="ProcessExcelFile"
+            Content="Process Excel file"
+            HorizontalAlignment="Right"
+            Margin="20,20,20,20"
+            VerticalAlignment="Top"
+            Width="140"
+            Height="30"
+            Click="ProcessExcelFile_ClickAsync"
+        />
+        <Button
+            Name="ProcessCorelDRAWFile"
+            Content="Process CorelDRAW file"
+            HorizontalAlignment="Right"
+            Margin="20,70,20,20"
+            VerticalAlignment="Top"
+            Width="140"
+            Height="30"
+            Click="ProcessCorelDRAWFile_ClickAsync"
+            IsEnabled="False"
+        />
+        <!--<Button
+            Name="Cancel"
+            Content="Cancel"
+            HorizontalAlignment="Left"
+            Margin="20,120,0,0"
+            VerticalAlignment="Top"
+            Width="140"
+            Height="30"
+            Click="Cancel_Click"
+        />-->
+        <TextBox
+            Name="OutputText"
+            HorizontalAlignment="Stretch"
+            Margin="20,20,180,80"
+            TextWrapping="Wrap"
+            Text=""
+            VerticalAlignment="Stretch"
+            ScrollViewer.VerticalScrollBarVisibility="Auto"
+            IsReadOnly="True"
+            BorderBrush="{x:Null}"
+            FontSize="14"
+        />
+        <ProgressBar
+            Name="ProgressBar"
+            Minimum="0"
+            Maximum="100"
+            HorizontalAlignment="Stretch"
+            Height="40"
+            Margin="20,20,20,20"
+            VerticalAlignment="Bottom" Foreground="#FF0035A8"
+        />
     </Grid>
 </Window>

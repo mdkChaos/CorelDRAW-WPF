@@ -115,6 +115,10 @@ namespace CorelDRAW_WPF
                     mainWindow.OutputText.Text += "Обработанно: " + datas.Count + " строк.\n";
                     mainWindow.OutputText.ScrollToEnd();
                 }));
+                await mainWindow.ProcessCorelDRAWFile.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
+                {
+                    mainWindow.ProcessCorelDRAWFile.IsEnabled = true;
+                }));
             }
             catch (OperationCanceledException)
             {
@@ -136,6 +140,10 @@ namespace CorelDRAW_WPF
             {
                 workBook.Close();
                 excelApp.Quit();
+                await mainWindow.ProcessExcelFile.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(delegate ()
+                {
+                    mainWindow.ProcessExcelFile.IsEnabled = true;
+                }));
                 Marshal.ReleaseComObject(workSheet);
                 Marshal.ReleaseComObject(workSheets);
                 Marshal.ReleaseComObject(workBook);
@@ -151,10 +159,10 @@ namespace CorelDRAW_WPF
 
         public async Task StartCorelTaskAsync(CancellationTokenSource cts)
         {
-            await Task.Run(() => StartCorelDRAWAsync(cts));
+            await Task.Run(() => StartCorelDRAWAsync(datas, cts));
         }
 
-        async void StartCorelDRAWAsync(CancellationTokenSource cts)
+        async void StartCorelDRAWAsync(List<DataModel> datas, CancellationTokenSource cts)
         {
             CorelDRAW.Application corelApp = null;
             VGCore.Document document = null;
@@ -172,9 +180,11 @@ namespace CorelDRAW_WPF
             Stopwatch sw = new Stopwatch();
             int count = 0;
             string fullPath;
+            List<DataModel> data;
 
             try
             {
+                data = datas;
                 OpenFile("CorelDRAW files(*.cdr)|*.cdr");
                 await mainWindow.ProgressBar.Dispatcher.BeginInvoke(DispatcherPriority.Send, new Action(delegate ()
                 {
@@ -201,7 +211,7 @@ namespace CorelDRAW_WPF
                 //document = corelApp.CreateDocument();
                 document.Unit = VGCore.cdrUnit.cdrMillimeter;
 
-                foreach (DataModel item in datas)
+                foreach (DataModel item in data)
                 {
                     if (item.IsUp)
                     {
@@ -272,7 +282,7 @@ namespace CorelDRAW_WPF
                         }));
                         await mainWindow.ProgressBar.Dispatcher.BeginInvoke(DispatcherPriority.Send, new Action(delegate ()
                         {
-                            mainWindow.ProgressBar.Value = (double)count * 100 / datas.Count;
+                            mainWindow.ProgressBar.Value = (double)count * 100 / data.Count;
                         }));
                     }
                     else
@@ -341,7 +351,7 @@ namespace CorelDRAW_WPF
                         }));
                         await mainWindow.ProgressBar.Dispatcher.BeginInvoke(DispatcherPriority.Send, new Action(delegate ()
                         {
-                            mainWindow.ProgressBar.Value = (double)count * 100 / datas.Count;
+                            mainWindow.ProgressBar.Value = (double)count * 100 / data.Count;
                         }));
                     }
                 }
@@ -353,7 +363,7 @@ namespace CorelDRAW_WPF
                     sw.Stop();
 
                     mainWindow.OutputText.Text += "Время обработки файла CorelDRAW: " + (sw.ElapsedMilliseconds / 1000.0).ToString() + " сек.\n";
-                    mainWindow.OutputText.Text += "Обработанно: " + datas.Count + " строк.\n";
+                    mainWindow.OutputText.Text += "Обработанно: " + data.Count + " строк.\n";
                     mainWindow.OutputText.ScrollToEnd();
                 }));
 

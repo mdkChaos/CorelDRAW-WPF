@@ -19,33 +19,19 @@ namespace CorelDRAW_WPF
         private async void ProcessExcelFile_ClickAsync(object sender, RoutedEventArgs e)
         {
             ProcessExcelFile.IsEnabled = false;
-            ProcessCorelDRAWFile.IsEnabled = false;
-            //try
-            //{
-                cts = new CancellationTokenSource();
-                await controller.StartExcelTaskAsync(cts);
-            //}
-            //finally
-            //{
-                ProcessExcelFile.IsEnabled = true;
-                ProcessCorelDRAWFile.IsEnabled = true;
-            //}
+            cts = new CancellationTokenSource();
+            await controller.StartExcelTaskAsync(cts);
+            ProcessExcelFile.IsEnabled = true;
         }
 
         private async void ProcessCorelDRAWFile_ClickAsync(object sender, RoutedEventArgs e)
         {
             ProcessExcelFile.IsEnabled = false;
             ProcessCorelDRAWFile.IsEnabled = false;
-            //try
-            //{
-                cts = new CancellationTokenSource();
-                await controller.StartCorelTaskAsync(cts);
-            //}
-            //finally
-            //{
-                ProcessExcelFile.IsEnabled = true;
-                ProcessCorelDRAWFile.IsEnabled = true;
-            //}
+            cts = new CancellationTokenSource();
+            await controller.StartCorelTaskAsync(cts);
+            ProcessExcelFile.IsEnabled = true;
+            ProcessCorelDRAWFile.IsEnabled = true;
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
@@ -54,6 +40,11 @@ namespace CorelDRAW_WPF
             {
                 cts.Cancel();
             }
+        }
+
+        private void OutputText_IsMouseDirectlyOverChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+
         }
     }
 }
