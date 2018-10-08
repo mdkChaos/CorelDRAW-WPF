@@ -208,7 +208,6 @@ namespace CorelDRAW_WPF
 
                 sw.Start();
 
-                //document = corelApp.CreateDocument();
                 document.Unit = VGCore.cdrUnit.cdrMillimeter;
 
                 foreach (DataModel item in data)
