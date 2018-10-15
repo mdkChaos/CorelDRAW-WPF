@@ -13,13 +13,13 @@ namespace CorelDRAW_WPF
         public MainWindow()
         {
             InitializeComponent();
-            controller = new Controller(this);
         }
 
         private async void ProcessExcelFile_ClickAsync(object sender, RoutedEventArgs e)
         {
             ProcessExcelFile.IsEnabled = false;
             cts = new CancellationTokenSource();
+            controller = new Controller(this);
             await controller.StartExcelTaskAsync(cts);
             ProcessExcelFile.IsEnabled = true;
         }
@@ -40,11 +40,6 @@ namespace CorelDRAW_WPF
             {
                 cts.Cancel();
             }
-        }
-
-        private void OutputText_IsMouseDirectlyOverChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-
         }
     }
 }

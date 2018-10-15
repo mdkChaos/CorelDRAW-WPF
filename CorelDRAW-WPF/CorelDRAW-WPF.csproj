@@ -166,9 +166,6 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\corel-excel-32.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4.6 %28x86 and x64%29</ProductName>
@@ -179,6 +176,12 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ваш садик лого.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Logo_Vash_Sadik.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

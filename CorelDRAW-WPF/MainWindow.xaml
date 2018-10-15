@@ -1,36 +1,63 @@
 ﻿<Window x:Class="CorelDRAW_WPF.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:CorelDRAW_WPF"
-        mc:Ignorable="d"
-        Title="Import from Excel to CorelDRAW"
+        Title="Ваш Садик"
         Height="450"
         Width="800"
-        Icon="Images/corel-excel-32.ico">
+        MinHeight="360"
+        MinWidth="640"
+        Icon="Images/Logo_Vash_Sadik.ico">
     <Grid Background="#FF212121">
-        <Button
-            Name="ProcessExcelFile"
-            Content="Process Excel file"
-            HorizontalAlignment="Right"
-            Margin="20,20,20,20"
-            VerticalAlignment="Top"
-            Width="140"
-            Height="30"
-            Click="ProcessExcelFile_ClickAsync"
-        />
-        <Button
-            Name="ProcessCorelDRAWFile"
-            Content="Process CorelDRAW file"
-            HorizontalAlignment="Right"
-            Margin="20,70,20,20"
-            VerticalAlignment="Top"
-            Width="140"
-            Height="30"
-            Click="ProcessCorelDRAWFile_ClickAsync"
-            IsEnabled="False"
-        />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="200*"/>
+            <RowDefinition Height="80"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200*"/>
+            <ColumnDefinition Width="180"/>
+        </Grid.ColumnDefinitions>
+        <TextBox
+            Grid.Row="0"
+            Grid.Column="0"
+            Name="OutputText"
+            HorizontalAlignment="Stretch"
+            Margin="20"
+            Padding="10"
+            TextWrapping="Wrap"
+            Text=""
+            VerticalAlignment="Stretch"
+            ScrollViewer.VerticalScrollBarVisibility="Auto"
+            IsReadOnly="True"
+            BorderBrush="{x:Null}"
+            FontSize="14"
+            Foreground="White"
+        >
+            <TextBox.Background>
+                <ImageBrush ImageSource="Images/ваш садик лого.png" Opacity="0.3"/>
+            </TextBox.Background>
+        </TextBox>
+        <StackPanel
+            Grid.Column="1"
+        >
+            <Button
+                Name="ProcessExcelFile"
+                Content="Process Excel file"
+                HorizontalAlignment="Stretch"
+                Margin="20,20,20,10"
+                Padding="8"
+                Click="ProcessExcelFile_ClickAsync"
+            />
+            <Button
+                Name="ProcessCorelDRAWFile"
+                Content="Process CorelDRAW file"
+                HorizontalAlignment="Stretch"
+                Margin="20,10"
+                Padding="8"
+                Click="ProcessCorelDRAWFile_ClickAsync"
+                IsEnabled="False"
+            />
+        </StackPanel>
+
         <!--<Button
             Name="Cancel"
             Content="Cancel"
@@ -41,26 +68,17 @@
             Height="30"
             Click="Cancel_Click"
         />-->
-        <TextBox
-            Name="OutputText"
-            HorizontalAlignment="Stretch"
-            Margin="20,20,180,80"
-            TextWrapping="Wrap"
-            Text=""
-            VerticalAlignment="Stretch"
-            ScrollViewer.VerticalScrollBarVisibility="Auto"
-            IsReadOnly="True"
-            BorderBrush="{x:Null}"
-            FontSize="14"
-        />
         <ProgressBar
+            Grid.Row="1"
+            Grid.ColumnSpan="2"
             Name="ProgressBar"
             Minimum="0"
             Maximum="100"
             HorizontalAlignment="Stretch"
             Height="40"
-            Margin="20,20,20,20"
-            VerticalAlignment="Bottom" Foreground="#FF0035A8"
+            Margin="20"
+            VerticalAlignment="Bottom"
+            Foreground="#FF0035A8"
         />
     </Grid>
 </Window>

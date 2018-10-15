@@ -96,7 +96,7 @@ namespace CorelDRAW_WPF
                     ScreenUpdating = false,
                     EnableEvents = false
                 };
-                
+
                 workBooks = excelApp.Workbooks;
                 workBook = workBooks.Open(FileName);
                 sw.Start();
@@ -169,9 +169,11 @@ namespace CorelDRAW_WPF
             VGCore.Page page = null;
             VGCore.Layer layer = null;
             VGCore.Shape shape = null;
+            VGCore.Shape siteLogo = null;
             VGCore.Rect rect = null;
             VGCore.ImportFilter importFilter = null;
             VGCore.DataItem image = null;
+            const string LOGO = "www.vash-sadik.com";
             RectanglePosition rectanglePosition;
             RGBAssign rgbAssign;
             ArtisticText artisticText;
@@ -248,6 +250,36 @@ namespace CorelDRAW_WPF
 
                         fullPath = Path.GetDirectoryName(FileName) + @"\img\" + item.ImageNumber + ".png";
 
+                        rgbAssign = new RGBAssign(255, 41, 41);
+                        artisticText = new ArtisticText(193.745, 128.413, LOGO, "Arial", 16.591f, "Logo1", 63.174);
+                        CreateArtisticTextAsync(layer, artisticText, rgbAssign, cts);
+                        siteLogo = page.Shapes["Logo1"];
+                        siteLogo.Rotate(90);
+                        siteLogo.SizeHeight = 63.174;
+                        siteLogo.SizeWidth = 4.255;
+
+                        if (item.DoorWidth < 23)
+                        {
+                            siteLogo.CenterX = 195.872;
+                        }
+                        else if (item.DoorWidth >= 23 && item.DoorWidth < 25)
+                        {
+                            siteLogo.CenterX = 215.872;
+                        }
+                        else if (item.DoorWidth >= 25 && item.DoorWidth < 27)
+                        {
+                            siteLogo.CenterX = 235.872;
+                        }
+                        else if (item.DoorWidth >= 27 && item.DoorWidth < 29)
+                        {
+                            siteLogo.CenterX = 255.872;
+                        }
+                        else if (item.DoorWidth >= 29)
+                        {
+                            siteLogo.CenterX = 275.872;
+                        }
+                        siteLogo.CenterY = 160;
+
                         if (item.ImageNumber != "0")
                         {
                             importFilter = layer.ImportEx(fullPath, VGCore.cdrFilter.cdrPNG);
@@ -256,21 +288,9 @@ namespace CorelDRAW_WPF
                             shape = page.Shapes[item.ImageNumber + ".png"];
                             image = shape.ObjectData["Name"];
                             image.Value = item.ImageNumber;
-                            if (item.DoorWidth <= 25)
-                            {
-                                shape.PositionX = 202.438 - shape.SizeWidth;
-                                shape.PositionY = 159.9946 + shape.SizeHeight / 2;
-                            }
-                            else if (item.DoorWidth > 25 && item.DoorWidth < 29)
-                            {
-                                shape.PositionX = 258.8768 - shape.SizeWidth;
-                                shape.PositionY = 159.9946 + shape.SizeHeight / 2;
-                            }
-                            else if (item.DoorWidth >= 29)
-                            {
-                                shape.PositionX = 272.669 - shape.SizeWidth;
-                                shape.PositionY = 159.9946 + shape.SizeHeight / 2;
-                            }
+
+                            shape.CenterX = siteLogo.CenterX - siteLogo.SizeWidth / 2 - 10 - shape.SizeWidth / 2;
+                            shape.CenterY = siteLogo.CenterY;
                         }
 
                         count++;
@@ -317,6 +337,36 @@ namespace CorelDRAW_WPF
 
                         fullPath = Path.GetDirectoryName(FileName) + @"\img\" + item.ImageNumber + ".png";
 
+                        rgbAssign = new RGBAssign(255, 41, 41);
+                        artisticText = new ArtisticText(193.745, 128.413, LOGO, "Arial", 16.591f, "Logo2", 63.174);
+                        CreateArtisticTextAsync(layer, artisticText, rgbAssign, cts);
+                        siteLogo = page.Shapes["Logo2"];
+                        siteLogo.Rotate(90);
+                        siteLogo.SizeHeight = 63.174;
+                        siteLogo.SizeWidth = 4.255;
+
+                        if (item.DoorWidth < 23)
+                        {
+                            siteLogo.CenterX = 195.872;
+                        }
+                        else if (item.DoorWidth >= 23 && item.DoorWidth < 25)
+                        {
+                            siteLogo.CenterX = 215.872;
+                        }
+                        else if (item.DoorWidth >= 25 && item.DoorWidth < 27)
+                        {
+                            siteLogo.CenterX = 235.872;
+                        }
+                        else if (item.DoorWidth >= 27 && item.DoorWidth < 29)
+                        {
+                            siteLogo.CenterX = 255.872;
+                        }
+                        else if (item.DoorWidth >= 29)
+                        {
+                            siteLogo.CenterX = 275.872;
+                        }
+                        siteLogo.CenterY = 50;
+
                         if (item.ImageNumber != "0")
                         {
                             importFilter = layer.ImportEx(fullPath, VGCore.cdrFilter.cdrPNG);
@@ -325,21 +375,9 @@ namespace CorelDRAW_WPF
                             shape = page.Shapes[item.ImageNumber + ".png"];
                             image = shape.ObjectData["Name"];
                             image.Value = item.ImageNumber;
-                            if (item.DoorWidth <= 25)
-                            {
-                                shape.PositionX = 202.438 - shape.SizeWidth;
-                                shape.PositionY = 50.0126 + shape.SizeHeight / 2;
-                            }
-                            else if (item.DoorWidth > 25 && item.DoorWidth < 29)
-                            {
-                                shape.PositionX = 258.8768 - shape.SizeWidth;
-                                shape.PositionY = 50.0126 + shape.SizeHeight / 2;
-                            }
-                            else if (item.DoorWidth >= 29)
-                            {
-                                shape.PositionX = 272.669 - shape.SizeWidth;
-                                shape.PositionY = 50.0126 + shape.SizeHeight / 2;
-                            }
+
+                            shape.CenterX = siteLogo.CenterX - siteLogo.SizeWidth / 2 - 10 - shape.SizeWidth / 2;
+                            shape.CenterY = siteLogo.CenterY;
                         }
 
                         count++;
@@ -470,8 +508,8 @@ namespace CorelDRAW_WPF
                     VGCore.cdrTextCharSet.cdrCharSetMixed,
                     artisticText.Font,
                     artisticText.Size,
-                    VGCore.cdrTriState.cdrTrue,
-                    VGCore.cdrTriState.cdrTrue,
+                    VGCore.cdrTriState.cdrFalse,
+                    VGCore.cdrTriState.cdrFalse,
                     VGCore.cdrFontLine.cdrMixedFontLine,
                     VGCore.cdrAlignment.cdrLeftAlignment
                 );
