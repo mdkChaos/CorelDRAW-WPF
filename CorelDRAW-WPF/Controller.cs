@@ -182,6 +182,9 @@ namespace CorelDRAW_WPF
             Stopwatch sw = new Stopwatch();
             int count = 0;
             string fullPath;
+            string[] name;
+            string fullName;
+            float fontSize;
             List<DataModel> data;
 
             try
@@ -228,24 +231,39 @@ namespace CorelDRAW_WPF
                         rectanglePosition = new RectanglePosition(0, 210);
                         CreateRectangleRectAsync(rect, layer, rectanglePosition, rgbAssign, cts);
 
+                        name = item.ChildName.Split(' ');
+                        if (name.Length > 1)
+                        {
+                            fullName = name[0] + "\r\n" + name[1];
+                            fontSize = 102.5f;
+                        }
+                        else
+                        {
+                            fullName = name[0];
+                            fontSize = 205f;
+                        }
+
                         rgbAssign = new RGBAssign(255, 72, 41);
-                        artisticText = new ArtisticText(31.369, 138.2776, item.ChildName, "Kabarett Simple", 205, "Name1");
+                        artisticText = new ArtisticText(31.369, 138.2776, fullName, "Kabarett Simple", fontSize, "Name1");
                         CreateArtisticTextAsync(layer, artisticText, rgbAssign, cts);
+                        shape = page.Shapes["Name1"];
+                        //shape.SizeHeight = 61.761;
+                        shape.CenterY = 160;
 
                         cmykAssign = new CMYKAssign(0, 0, 0, 100);
-                        paragraphText = new ParagraphText(13.555, 100.591, 29.112, 109.311, item.ImageNumber, "Arial", 18, "ImageNumber1");
+                        paragraphText = new ParagraphText(13.555, 105, 29.112, 110, item.ImageNumber, "Arial", 12, "ImageNumber1");
                         CreateParagraphTextAsync(layer, paragraphText, cmykAssign, cts);
 
                         cmykAssign = new CMYKAssign(100, 0, 0, 0);
-                        paragraphText = new ParagraphText(29.669, 100.591, 45.227, 109.311, item.DoorWidth.ToString(), "Arial", 18, "DoorWidth1");
+                        paragraphText = new ParagraphText(29.669, 105, 45.227, 110, item.DoorWidth.ToString(), "Arial", 12, "DoorWidth1");
                         CreateParagraphTextAsync(layer, paragraphText, cmykAssign, cts);
 
                         cmykAssign = new CMYKAssign(100, 0, 100, 0);
-                        paragraphText = new ParagraphText(45.783, 100.591, 72.548, 109.311, item.Pocket, "Arial", 18, "Pocket1");
+                        paragraphText = new ParagraphText(45.783, 105, 72.548, 110, item.Pocket, "Arial", 12, "Pocket1");
                         CreateParagraphTextAsync(layer, paragraphText, cmykAssign, cts);
 
                         cmykAssign = new CMYKAssign(0, 88, 97, 0);
-                        paragraphText = new ParagraphText(73.104, 100.591, 149.288, 109.311, item.Customer, "Arial", 9, "Customer1");
+                        paragraphText = new ParagraphText(73.104, 105, 149.288, 110, item.Customer, "Arial", 12, "Customer1");
                         CreateParagraphTextAsync(layer, paragraphText, cmykAssign, cts);
 
                         fullPath = Path.GetDirectoryName(FileName) + @"\img\" + item.ImageNumber + ".png";
@@ -315,24 +333,37 @@ namespace CorelDRAW_WPF
                         rectanglePosition = new RectanglePosition(0, 100);
                         CreateRectangleRectAsync(rect, layer, rectanglePosition, rgbAssign, cts);
 
+                        name = item.ChildName.Split(' ');
+                        if (name.Length > 1)
+                        {
+                            fullName = name[0] + "\r\n" + name[1];
+                            fontSize = 102.5f;
+                        }
+                        else
+                        {
+                            fullName = name[0];
+                            fontSize = 205f;
+                        }
                         rgbAssign = new RGBAssign(255, 72, 41);
-                        artisticText = new ArtisticText(31.369, 28.7782, item.ChildName, "Kabarett Simple", 205, "Name2");
+                        artisticText = new ArtisticText(31.369, 28.7782, fullName, "Kabarett Simple", fontSize, "Name2");
                         CreateArtisticTextAsync(layer, artisticText, rgbAssign, cts);
+                        shape = page.Shapes["Name2"];
+                        shape.CenterY = 50;
 
                         cmykAssign = new CMYKAssign(0, 0, 0, 100);
-                        paragraphText = new ParagraphText(226.538, 100.591, 242.096, 109.311, item.ImageNumber, "Arial", 18, "ImageNumber2");
+                        paragraphText = new ParagraphText(226.538, 100, 242.096, 105, item.ImageNumber, "Arial", 12, "ImageNumber2", 2);
                         CreateParagraphTextAsync(layer, paragraphText, cmykAssign, cts);
 
                         cmykAssign = new CMYKAssign(100, 0, 0, 0);
-                        paragraphText = new ParagraphText(242.652, 100.591, 258.21, 109.311, item.DoorWidth.ToString(), "Arial", 18, "DoorWidth2");
+                        paragraphText = new ParagraphText(242.652, 100, 258.21, 105, item.DoorWidth.ToString(), "Arial", 12, "DoorWidth2", 2);
                         CreateParagraphTextAsync(layer, paragraphText, cmykAssign, cts);
 
                         cmykAssign = new CMYKAssign(100, 0, 100, 0);
-                        paragraphText = new ParagraphText(258.767, 100.591, 285.868, 109.311, item.Pocket, "Arial", 18, "Pocket2");
+                        paragraphText = new ParagraphText(258.767, 100, 285.868, 105, item.Pocket, "Arial", 12, "Pocket2", 2);
                         CreateParagraphTextAsync(layer, paragraphText, cmykAssign, cts);
 
                         cmykAssign = new CMYKAssign(0, 88, 97, 0);
-                        paragraphText = new ParagraphText(149.845, 100.591, 225.982, 109.311, item.Customer, "Arial", 9, "Customer2");
+                        paragraphText = new ParagraphText(149.845, 100, 225.982, 105, item.Customer, "Arial", 12, "Customer2", 2);
                         CreateParagraphTextAsync(layer, paragraphText, cmykAssign, cts);
 
                         fullPath = Path.GetDirectoryName(FileName) + @"\img\" + item.ImageNumber + ".png";
@@ -511,7 +542,7 @@ namespace CorelDRAW_WPF
                     VGCore.cdrTriState.cdrFalse,
                     VGCore.cdrTriState.cdrFalse,
                     VGCore.cdrFontLine.cdrMixedFontLine,
-                    VGCore.cdrAlignment.cdrLeftAlignment
+                    (VGCore.cdrAlignment)artisticText.Alignment
                 );
                 fill = shape.Fill;
                 color = fill.UniformColor;
@@ -575,7 +606,7 @@ namespace CorelDRAW_WPF
                 story = text.Story;
                 story.Style = VGCore.cdrFontStyle.cdrBoldFontStyle;
                 story.Size = paragraphText.Size;
-                story.Alignment = VGCore.cdrAlignment.cdrLeftAlignment;
+                story.Alignment = (VGCore.cdrAlignment)paragraphText.Alignment;//VGCore.cdrAlignment.cdrLeftAlignment;
                 outline = shape.Outline;
                 outline.SetNoOutline();
                 shape.Name = paragraphText.Name;

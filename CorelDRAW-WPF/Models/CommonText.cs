@@ -14,6 +14,7 @@ namespace CorelDRAW_WPF.Models
         public string Font { get; }
         public float Size { get; }
         public string Name { get; }
+        public int Alignment { get; set; }
 
         public CommonText(
             double left,
@@ -21,7 +22,8 @@ namespace CorelDRAW_WPF.Models
             string text,
             string font,
             float size,
-            string name
+            string name,
+            int alignment
         )
         {
             Left = left;
@@ -30,6 +32,7 @@ namespace CorelDRAW_WPF.Models
             Font = font;
             Size = size;
             Name = name;
+            Alignment = alignment;
         }
     }
 }

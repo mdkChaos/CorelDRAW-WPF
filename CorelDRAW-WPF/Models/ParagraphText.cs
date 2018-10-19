@@ -19,8 +19,9 @@ namespace CorelDRAW_WPF.Models
             string text,
             string font = "Arial",
             float size = 12,
-            string name = "Name"
-        ) : base(left, bottom, text, font, size, name)
+            string name = "Name",
+            int alignment = 1
+        ) : base(left, bottom, text, font, size, name, alignment)
         {
             Top = top;
             Right = right;

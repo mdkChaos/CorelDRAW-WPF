@@ -17,8 +17,9 @@ namespace CorelDRAW_WPF.Models
             string font = "Arial",
             float size = 12,
             string name = "Name",
-            double sizeWidth = 114.3
-        ) : base(left, bottom, text, font, size, name)
+            double sizeWidth = 114.3,
+            int alignment = 1
+        ) : base(left, bottom, text, font, size, name, alignment)
         {
             SizeWidth = sizeWidth;
         }
