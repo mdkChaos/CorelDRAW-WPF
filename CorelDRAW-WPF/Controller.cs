@@ -8,7 +8,6 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Threading;
 using Excel = Microsoft.Office.Interop.Excel;
 
@@ -33,13 +32,13 @@ namespace CorelDRAW_WPF
             {
                 DataModel dataModel = new DataModel
                 {
-                    Customer = workSheet.Cells[row, 1].Text,
-                    ChildName = workSheet.Cells[row, 2].Text,
-                    DoorWidth = Convert.ToDouble(workSheet.Cells[row, 4].Text),
-                    Pocket = workSheet.Cells[row, 5].Text
+                    Customer = workSheet.Cells[row, 1].Text.Trim(),
+                    ChildName = workSheet.Cells[row, 2].Text.Trim(),
+                    DoorWidth = Convert.ToDouble(workSheet.Cells[row, 4].Text.Trim()),
+                    Pocket = workSheet.Cells[row, 6].Text.Trim()
                 };
 
-                if (int.TryParse(workSheet.Cells[row, 3].Text, out int imgNum))
+                if (int.TryParse(workSheet.Cells[row, 3].Text.Trim(), out int imgNum))
                 {
                     dataModel.ImageNumber = imgNum.ToString();
                 }
@@ -47,7 +46,17 @@ namespace CorelDRAW_WPF
                 {
                     dataModel.ImageNumber = "0";
                 }
-                if (Convert.ToInt32(workSheet.Cells[row, 6].Text) == 1)
+
+                if (int.TryParse(workSheet.Cells[row, 5].Text.Trim(), out int backgroundNum))
+                {
+                    dataModel.BackgroundNumber = backgroundNum.ToString();
+                }
+                else
+                {
+                    dataModel.BackgroundNumber = "1";
+                }
+
+                if (Convert.ToInt32(workSheet.Cells[row, 7].Text.Trim()) == 1)
                 {
                     dataModel.IsUp = true;
                 }
@@ -231,6 +240,21 @@ namespace CorelDRAW_WPF
                         rectanglePosition = new RectanglePosition(0, 210);
                         CreateRectangleRectAsync(rect, layer, rectanglePosition, rgbAssign, cts);
 
+                        //Add background image
+                        fullPath = Path.GetDirectoryName(FileName) + @"\fon\" + item.BackgroundNumber + ".png";
+                        if (item.BackgroundNumber != "0")
+                        {
+                            importFilter = layer.ImportEx(fullPath, VGCore.cdrFilter.cdrPNG);
+                            importFilter.Finish();
+
+                            shape = page.Shapes[item.BackgroundNumber + ".png"];
+                            image = shape.ObjectData["Name"];
+                            image.Value = item.BackgroundNumber;
+
+                            shape.PositionX = 0;
+                            shape.PositionY = 210;
+                        }
+
                         name = item.ChildName.Split(' ');
                         if (name.Length > 1)
                         {
@@ -332,6 +356,20 @@ namespace CorelDRAW_WPF
                         rgbAssign = new RGBAssign(255, 255, 0);
                         rectanglePosition = new RectanglePosition(0, 100);
                         CreateRectangleRectAsync(rect, layer, rectanglePosition, rgbAssign, cts);
+
+                        fullPath = Path.GetDirectoryName(FileName) + @"\fon\" + item.BackgroundNumber + ".png";
+                        if (item.BackgroundNumber != "0")
+                        {
+                            importFilter = layer.ImportEx(fullPath, VGCore.cdrFilter.cdrPNG);
+                            importFilter.Finish();
+
+                            shape = page.Shapes[item.BackgroundNumber + ".png"];
+                            image = shape.ObjectData["Name"];
+                            image.Value = item.BackgroundNumber;
+
+                            shape.PositionX = 0;
+                            shape.PositionY = 100;
+                        }
 
                         name = item.ChildName.Split(' ');
                         if (name.Length > 1)
