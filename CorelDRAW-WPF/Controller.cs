@@ -241,13 +241,13 @@ namespace CorelDRAW_WPF
                         CreateRectangleRectAsync(rect, layer, rectanglePosition, rgbAssign, cts);
 
                         //Add background image
-                        fullPath = Path.GetDirectoryName(FileName) + @"\fon\" + item.BackgroundNumber + ".png";
+                        fullPath = Path.GetDirectoryName(FileName) + @"\fon\" + item.BackgroundNumber + ".jpeg";
                         if (item.BackgroundNumber != "0")
                         {
                             importFilter = layer.ImportEx(fullPath, VGCore.cdrFilter.cdrPNG);
                             importFilter.Finish();
 
-                            shape = page.Shapes[item.BackgroundNumber + ".png"];
+                            shape = page.Shapes[item.BackgroundNumber + ".jpeg"];
                             image = shape.ObjectData["Name"];
                             image.Value = item.BackgroundNumber;
 
@@ -357,13 +357,13 @@ namespace CorelDRAW_WPF
                         rectanglePosition = new RectanglePosition(0, 100);
                         CreateRectangleRectAsync(rect, layer, rectanglePosition, rgbAssign, cts);
 
-                        fullPath = Path.GetDirectoryName(FileName) + @"\fon\" + item.BackgroundNumber + ".png";
+                        fullPath = Path.GetDirectoryName(FileName) + @"\fon\" + item.BackgroundNumber + ".jpeg";
                         if (item.BackgroundNumber != "0")
                         {
                             importFilter = layer.ImportEx(fullPath, VGCore.cdrFilter.cdrPNG);
                             importFilter.Finish();
 
-                            shape = page.Shapes[item.BackgroundNumber + ".png"];
+                            shape = page.Shapes[item.BackgroundNumber + ".jpeg"];
                             image = shape.ObjectData["Name"];
                             image.Value = item.BackgroundNumber;
 
