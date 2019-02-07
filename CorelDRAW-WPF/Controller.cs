@@ -231,26 +231,28 @@ namespace CorelDRAW_WPF
                         page = document.InsertPagesEx(1, false, document.ActivePage.Index, 297, 210);
                         layer = page.Layers[2];
 
-                        rect = new VGCore.Rect
-                        {
-                            Width = 297,
-                            Height = 100
-                        };
-                        rgbAssign = new RGBAssign(255, 255, 0);
-                        rectanglePosition = new RectanglePosition(0, 210);
-                        CreateRectangleRectAsync(rect, layer, rectanglePosition, rgbAssign, cts);
+                        //rect = new VGCore.Rect
+                        //{
+                        //    Width = 297,
+                        //    Height = 100
+                        //};
+                        //rgbAssign = new RGBAssign(255, 255, 255);
+                        //rectanglePosition = new RectanglePosition(0, 210);
+                        //CreateRectangleRectAsync(rect, layer, rectanglePosition, rgbAssign, cts);
 
                         //Add background image
                         fullPath = Path.GetDirectoryName(FileName) + @"\fon\" + item.BackgroundNumber + ".jpeg";
                         if (item.BackgroundNumber != "0")
                         {
-                            importFilter = layer.ImportEx(fullPath, VGCore.cdrFilter.cdrPNG);
+                            importFilter = layer.ImportEx(fullPath, VGCore.cdrFilter.cdrJPEG);
                             importFilter.Finish();
 
                             shape = page.Shapes[item.BackgroundNumber + ".jpeg"];
                             image = shape.ObjectData["Name"];
                             image.Value = item.BackgroundNumber;
 
+                            shape.SizeWidth = 297;
+                            shape.SizeHeight = 100;
                             shape.PositionX = 0;
                             shape.PositionY = 210;
                         }
@@ -348,25 +350,27 @@ namespace CorelDRAW_WPF
                     }
                     else
                     {
-                        rect = new VGCore.Rect
-                        {
-                            Width = 297,
-                            Height = 100
-                        };
-                        rgbAssign = new RGBAssign(255, 255, 0);
-                        rectanglePosition = new RectanglePosition(0, 100);
-                        CreateRectangleRectAsync(rect, layer, rectanglePosition, rgbAssign, cts);
+                        //rect = new VGCore.Rect
+                        //{
+                        //    Width = 297,
+                        //    Height = 100
+                        //};
+                        //rgbAssign = new RGBAssign(255, 255, 255);
+                        //rectanglePosition = new RectanglePosition(0, 100);
+                        //CreateRectangleRectAsync(rect, layer, rectanglePosition, rgbAssign, cts);
 
                         fullPath = Path.GetDirectoryName(FileName) + @"\fon\" + item.BackgroundNumber + ".jpeg";
                         if (item.BackgroundNumber != "0")
                         {
-                            importFilter = layer.ImportEx(fullPath, VGCore.cdrFilter.cdrPNG);
+                            importFilter = layer.ImportEx(fullPath, VGCore.cdrFilter.cdrJPEG);
                             importFilter.Finish();
 
                             shape = page.Shapes[item.BackgroundNumber + ".jpeg"];
                             image = shape.ObjectData["Name"];
                             image.Value = item.BackgroundNumber;
 
+                            shape.SizeWidth = 297;
+                            shape.SizeHeight = 100;
                             shape.PositionX = 0;
                             shape.PositionY = 100;
                         }
