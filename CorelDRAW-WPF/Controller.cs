@@ -179,11 +179,11 @@ namespace CorelDRAW_WPF
             VGCore.Layer layer = null;
             VGCore.Shape shape = null;
             VGCore.Shape siteLogo = null;
-            VGCore.Rect rect = null;
+            //VGCore.Rect rect = null;
             VGCore.ImportFilter importFilter = null;
             VGCore.DataItem image = null;
             const string LOGO = "www.vash-sadik.com";
-            RectanglePosition rectanglePosition;
+            //RectanglePosition rectanglePosition;
             RGBAssign rgbAssign;
             ArtisticText artisticText;
             CMYKAssign cmykAssign;
@@ -241,13 +241,13 @@ namespace CorelDRAW_WPF
                         //CreateRectangleRectAsync(rect, layer, rectanglePosition, rgbAssign, cts);
 
                         //Add background image
-                        fullPath = Path.GetDirectoryName(FileName) + @"\fon\" + item.BackgroundNumber + ".jpeg";
+                        fullPath = Path.GetDirectoryName(FileName) + @"\fon\" + item.BackgroundNumber + ".jpg";
                         if (item.BackgroundNumber != "0")
                         {
                             importFilter = layer.ImportEx(fullPath, VGCore.cdrFilter.cdrJPEG);
                             importFilter.Finish();
 
-                            shape = page.Shapes[item.BackgroundNumber + ".jpeg"];
+                            shape = page.Shapes[item.BackgroundNumber + ".jpg"];
                             image = shape.ObjectData["Name"];
                             image.Value = item.BackgroundNumber;
 
@@ -359,13 +359,13 @@ namespace CorelDRAW_WPF
                         //rectanglePosition = new RectanglePosition(0, 100);
                         //CreateRectangleRectAsync(rect, layer, rectanglePosition, rgbAssign, cts);
 
-                        fullPath = Path.GetDirectoryName(FileName) + @"\fon\" + item.BackgroundNumber + ".jpeg";
+                        fullPath = Path.GetDirectoryName(FileName) + @"\fon\" + item.BackgroundNumber + ".jpg";
                         if (item.BackgroundNumber != "0")
                         {
                             importFilter = layer.ImportEx(fullPath, VGCore.cdrFilter.cdrJPEG);
                             importFilter.Finish();
 
-                            shape = page.Shapes[item.BackgroundNumber + ".jpeg"];
+                            shape = page.Shapes[item.BackgroundNumber + ".jpg"];
                             image = shape.ObjectData["Name"];
                             image.Value = item.BackgroundNumber;
 
@@ -509,9 +509,10 @@ namespace CorelDRAW_WPF
             }
             finally
             {
-                Marshal.ReleaseComObject(rect);
                 Marshal.ReleaseComObject(image);
                 Marshal.ReleaseComObject(importFilter);
+                //Marshal.ReleaseComObject(rect);
+                Marshal.ReleaseComObject(siteLogo);
                 Marshal.ReleaseComObject(shape);
                 Marshal.ReleaseComObject(layer);
                 Marshal.ReleaseComObject(page);
